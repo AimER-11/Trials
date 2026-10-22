@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Archive: Birthday Anomaly Detected</title>
+    <!-- Tailwind CSS CDN for modern utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Retro Monospace Terminal & Handwritten Aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fira+Code:wght@400;600&family=Patrick+Hand&family=VT323&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Modern Design System & Hand-Drawn Design Tokens */
+        :root {
+            --bg-cream: #FDFBF7;
+            --lavender: #E6E1F5;
+            --dusty-pink: #F7D6D0;
+            --midnight: #2D1E2F;
+            --muted-yellow: #FFF3CD;
+            --terminal-green: #39FF14;
+            --accent-mint: #D4F1F4;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            color: var(--midnight);
+            font-family: 'Patrick Hand', cursive, sans-serif;
+            background-image: radial-gradient(#2d1e2f 0.75px, transparent 0.75px);
+            background-size: 24px 24px;
+            background-position: 0 0;
+            overflow-x: hidden;
+        }
+
+        .font-terminal {
+            font-family: 'VT323', monospace;
+        }
+
+        .font-code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .font-handwriting {
+            font-family: 'Caveat', cursive;
+        }
+
+        /* Hand-Drawn Wobbly Borders (Organic Scrapbook Look) */
+        .wobbly-border {
+            border: 3px solid var(--midnight);
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+            transition: all 0.25s ease-in-out;
+        }
+
+        .wobbly-border-sm {
+            border: 2px solid var(--midnight);
+            border-radius: 125px 10px 105px 10px/10px 105px 10px 125px;
+        }
+
+        .wobbly-border:hover {
+            border-radius: 15px 225px 15px 255px/255px 15px 225px 15px;
+            transform: scale(1.01) rotate(-0.5deg);
+        }
+
+        /* Paper Tape Effect */
+        .tape {
+            background-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            transform: rotate(-3deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--lavender);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--midnight);
+            border-radius: 5px;
+        }
+
+        /* Animations */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        .animate-float {
+            animation: floatSlow 4s ease-in-out infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+
+        .scanline-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanline-effect::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background-size: 100% 4px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Custom Audio Visualizer Bars */
+        .eq-bar {
+            width: 6px;
+            background-color: var(--midnight);
+            border-radius: 3px;
+            animation: eqBounce 1s ease-in-out infinite alternate;
+        }
+        @keyframes eqBounce {
+            0% { height: 10%; }
+            100% { height: 100%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-lg selection:bg-pink-200">
+
+    <!-- ==========================================
+         SECTION 1: THE OPENING TERMINAL SEQUENCE
+         ========================================== -->
+    <div id="terminalScreen" class="fixed inset-0 z-40 bg-slate-950 text-green-400 font-terminal p-4 md:p-10 flex flex-col justify-between scanline-effect transition-opacity duration-700">
+        <div class="max-w-4xl mx-auto w-full">
+            <div class="flex items-center justify-between border-b border-green-800 pb-2 mb-4 text-sm md:text-xl">
+                <span>SYSTEM_ARCHIVE_v2026.04 // CLASSIFIED_HUMAN_LOG</span>
+                <span class="animate-pulse">● ONLINE</span>
+            </div>
+            
+            <div id="terminalLog" class="space-y-3 text-lg md:text-2xl font-code text-green-300 leading-relaxed min-h-[250px]">
+                <!-- Dynamic typewriter text will load here via JavaScript -->
+            </div>
+
+            <!-- Diagnostic Progress Bar -->
+            <div class="mt-8 border border-green-700 p-2 rounded bg-slate-900">
+                <div class="flex justify-between text-xs md:text-sm mb-1 text-green-400">
+                    <span id="progressStatus">Initializing scanning protocols...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-4 rounded overflow-hidden">
+                    <div id="progressBar" class="bg-green-400 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center pb-6">
+            <button id="accessBtn" onclick="unlockMainArchive()" class="hidden opacity-0 transform translate-y-4 transition-all duration-500 bg-green-500 text-slate-950 font-bold px-8 py-4 rounded-xl text-2xl hover:bg-green-400 hover:scale-105 shadow-[0_0_20px_rgba(57,255,20,0.5)] font-terminal">
+                🔓 ACCESS PERSONAL ARCHIVE
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MAIN WEBSITE CONTENT (REVEALED AFTER TERMINAL)
+         ========================================== -->
+    <main id="mainContent" class="hidden opacity-0 transition-opacity duration-1000 max-w-5xl mx-auto px-4 py-8 space-y-16">
+
+        <!-- Navigation Bar -->
+        <nav class="sticky top-4 z-30 bg-white/80 backdrop-blur-md wobbly-border p-3 shadow-md flex flex-wrap justify-center md:justify-between items-center gap-2">
+            <div class="font-terminal text-2xl font-bold tracking-widest text-purple-900">
+                <span class="friend-name-display">Da Sahaj Gallery</span>
+            </div>
+            <div class="flex flex-wrap gap-2 text-base font-bold">
+                <a href="#artRoom" class="px-3 py-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-800 transition">🎨 Art Gallery</a>
+                <a href="#musicPortal" class="px-3 py-1 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-800 transition">🎵 Music Vault</a>
+                <a href="#memeArchive" class="px-3 py-1 rounded-full bg-yellow-100 hover:bg-yellow-200 text-yellow-800 transition">🐸 Meme Lab</a>
+            </div>
+        </nav>
+
+        <!-- ==========================================
+             SECTION 2: BIRTHDAY HOMEPAGE BANNER
+             ========================================== -->
+        <section id="hero" class="relative bg-amber-50/80 wobbly-border p-6 md:p-12 text-center shadow-xl overflow-hidden">
+            <!-- Decorative Floating SVGs/Doodles -->
+            <div class="absolute -top-4 -left-4 w-16 h-16 text-purple-400 animate-float">
+                <svg viewBox="0 0 100 100" fill="currentColor"><path d="M50 0 L60 35 L95 35 L67 55 L77 90 L50 70 L23 90 L33 55 L5 35 L40 35 Z"/></svg>
+            </div>
+            <div class="absolute top-1/2 -right-6 w-20 h-20 text-pink-300 animate-float" style="animation-delay: 1.5s;">
+                <svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none"/></svg>
+            </div>
+
+            <!-- Tape Decorator -->
+            <div class="tape absolute -top-3 left-1/2 -translate-x-1/2 w-40 h-8 z-10 border border-slate-300"></div>
+
+            <span class="inline-block px-4 py-1 rounded-full bg-purple-200 text-purple-900 font-code text-sm font-semibold mb-4">
+                🎉 CONFIRMED EVENT: EARTH ROTATION ANOMALY
+            </span>
+
+            <h1 class="text-4xl md:text-7xl font-bold font-handwriting text-slate-900 tracking-wide mb-4">
+                Happy Birthday, <span class="friend-name-display text-purple-700 underline decoration-wavy decoration-pink-400">Da Artist of Da Gallery</span>!
+            </h1>
+
+            <p class="text-xl md:text-2xl text-slate-700 max-w-2xl mx-auto mb-8 font-sans leading-relaxed">
+                Welcome to your hand-coded digital universe! Built specifically to celebrate your boundless creativity, iconic music taste, chronically online humor, and overall magical existence.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <button onclick="triggerMiniSurprise()" class="wobbly-border-sm bg-yellow-200 hover:bg-yellow-300 text-slate-900 font-bold px-6 py-3 transition transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <span>✨</span> Click For Magical Surprise!
+                </button>
+                <a href="#artRoom" class="wobbly-border-sm bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 transition transform hover:scale-105 flex items-center gap-2">
+                    <span>🎨</span> Enter Visual Vault
+                </a>
+            </div>
+
+            <!-- Mini Interactive Pop-up Log -->
+            <div id="interactiveFeedback" class="mt-6 text-sm font-code text-purple-800 min-h-[24px]"></div>
+        </section>
+
+        <!-- ==========================================
+             SECTION 3: THE ART ROOM (GALLERY)
+             ========================================== -->
+        <section id="artRoom" class="bg-white/90 wobbly-border p-6 md:p-10 shadow-lg relative">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b-2 border-slate-200 pb-4">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-bold font-handwriting text-slate-900">🎨 The Masterpiece Gallery</h2>
+                    <p class="text-slate-600 text-base">Curated exhibition celebrating character art, sketches, and visual wizardry.</p>
+                </div>
+                <span class="mt-2 md:mt-0 font-code text-xs bg-slate-100 border border-slate-300 p-2 rounded">
+                    📌 Curator Note: Click any artwork for deep curator annotations!
+                </span>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Gallery Item 1 -->
+                <div onclick="openArtModal('Character Study #1', 'Hand-drawn character conceptualization', 'Medium: Digital Soul & 3 AM Inspiration\nEstimated Value: Priceless in 14 dimensions.', 'https://placehold.co/600x600/2d1e2f/FDFBF7?text=Your+Character+Art+Here')" class="group cursor-pointer bg-slate-50 p-4 wobbly-border-sm hover:shadow-xl transition transform hover:-translate-y-1">
+                    <div class="overflow-hidden rounded border border-slate-300 bg-slate-200 mb-3 relative">
+                        <img src="s1.jpeg" alt="Character Art Placeholder 1" class="w-full h-64 object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-2 right-2 bg-yellow-300 text-slate-900 font-bold text-xs px-2 py-1 rounded wobbly-border-sm">EXHIBIT A</span>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-900">Masterpiece: Line & Expression</h3>
+                    <p class="text-sm text-slate-600 italic">"The sheer depth of character emotion..."</p>
+                    <p class="mt-2 text-xs font-code text-purple-700">🔍 Click to read curator's secret report</p>
+                </div>
+
+                <!-- Gallery Item 2 -->
+                <div onclick="openArtModal('Atmospheric Painting', 'Visual art exploration', 'Medium: Mixed Feelings & Aesthetic Color Palettes\nStatus: Hanging in the Louvre (in our minds).', 'https://placehold.co/600x600/f7d6d0/2d1e2f?text=Painting+Placeholder')" class="group cursor-pointer bg-slate-50 p-4 wobbly-border-sm hover:shadow-xl transition transform hover:-translate-y-1">
+                    <div class="overflow-hidden rounded border border-slate-300 bg-slate-200 mb-3 relative">
+                        <img src="draw.jpeg" alt="Painting Placeholder 2" class="w-full h-64 object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-2 right-2 bg-pink-300 text-slate-900 font-bold text-xs px-2 py-1 rounded wobbly-border-sm">EXHIBIT B</span>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-900">Color & Mood Study</h3>
+                    <p class="text-sm text-slate-600 italic">"A breathtaking display of tone and texture."</p>
+                    <p class="mt-2 text-xs font-code text-purple-700">🔍 Click to read curator's secret report</p>
+                </div>
+
+                <!-- Gallery Item 3 -->
+                <div onclick="openArtModal('Late Night Sketchbook Doodle', 'Spontaneous creative genius', 'Medium: Ink on Paper & Unfiltered Imagination\nRating: 10/10 Pure Magic.', 'https://placehold.co/600x600/e6e1f5/2d1e2f?text=Notebook+Doodle')" class="group cursor-pointer bg-slate-50 p-4 wobbly-border-sm hover:shadow-xl transition transform hover:-translate-y-1">
+                    <div class="overflow-hidden rounded border border-slate-300 bg-slate-200 mb-3 relative">
+                        <img src="doodle.jpeg" alt="Sketchbook Placeholder 3" class="w-full h-64 object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-2 right-2 bg-purple-300 text-slate-900 font-bold text-xs px-2 py-1 rounded wobbly-border-sm">EXHIBIT C</span>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-900">Notebook Chronicles</h3>
+                    <p class="text-sm text-slate-600 italic">"Spontaneous creativity captured in its raw form."</p>
+                    <p class="mt-2 text-xs font-code text-purple-700">🔍 Click to read curator's secret report</p>
+                </div>
+            </div>
+
+            <!-- How-To Replacement Instruction Box for the Code Owner -->
+            <div class="mt-6 p-4 bg-amber-50 border border-amber-300 rounded-lg text-xs font-code text-amber-900">
+                💡 <strong>Note:</strong> Da Artist is prone to articy.
+            </div>
+        </section>
+
+        <!-- Art Modal Popup -->
+        <div id="artModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+            <div class="bg-white wobbly-border max-w-xl w-full p-6 relative animate-float" style="animation-duration: 6s;">
+                <button onclick="closeArtModal()" class="absolute top-3 right-3 text-2xl font-bold hover:text-red-500">✖</button>
+                <img id="modalImg" src="" alt="Artwork detail" class="w-full h-64 object-cover rounded border border-slate-300 mb-4">
+                <h3 id="modalTitle" class="text-3xl font-bold font-handwriting text-purple-900 mb-1"></h3>
+                <p id="modalSubtitle" class="text-sm font-semibold text-slate-600 mb-3"></p>
+                <pre id="modalDescription" class="font-code text-xs bg-slate-100 p-3 rounded text-slate-800 whitespace-pre-wrap leading-relaxed border border-slate-200 mb-4"></pre>
+                <div class="text-right">
+                    <button onclick="closeArtModal()" class="bg-purple-800 text-white font-bold px-4 py-2 rounded text-sm hover:bg-purple-900">Close Exhibit</button>
+                </div>
+            </div>
+        </div>
+
+<!-- ==========================================
+             SECTION 4: THE MUSIC PORTAL (YOUTUBE DIRECT)
+             ========================================== -->
+        <section id="musicPortal" class="bg-slate-900 text-slate-100 wobbly-border p-6 md:p-10 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-bold font-terminal text-green-400 tracking-wider">🎵 YOUTUBE MUSIC VAULT</h2>
+                    <p class="text-slate-400 text-sm font-code">Featuring Yuvan Shankar Raja, Spellbound vibes & Amrinder Gill favorites</p>
+                </div>
+                <!-- Equalizer Animation Widget -->
+                <div class="flex items-end gap-1 h-8">
+                    <div class="eq-bar" style="animation-delay: 0.1s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.4s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.2s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.5s;"></div>
+                </div>
+            </div>
+
+            <!-- YouTube Portal Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Main Highlight Player Card -->
+                <div class="lg:col-span-2 bg-slate-800 border-2 border-slate-700 rounded-xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center text-xs font-code text-slate-400 mb-3">
+                            <span>FEATURED TRACK STREAM</span>
+                            <span class="text-red-400">● YOUTUBE HD</span>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700 mb-4">
+                            <h3 id="currentTrackTitle" class="text-2xl font-bold text-yellow-400 font-terminal tracking-wide">Spellbound - Yuvan Shankar Raja</h3>
+                            <p id="currentArtist" class="text-slate-400 text-sm font-code">Cinematic Masterpiece Selection</p>
+                        </div>
+                        
+                        <!-- Interactive Note about why this track is special -->
+                        <div id="trackPersonalNote" class="bg-purple-950/60 border border-purple-800 p-4 rounded text-sm text-purple-200 font-sans italic mb-4">
+                            "This track represents the ultimate cinematic soundscape—pure atmospheric magic that fits your creative wavelengths perfectly."
+                        </div>
+                    </div>
+
+                    <!-- Direct YouTube Player/Link Controls -->
+                    <div class="space-y-4">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <a id="externalMusicLink" href="https://www.youtube.com/results?search_query=Spellbound+Yuvan+Shankar+Raja" target="_blank" rel="noopener noreferrer" class="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-3 rounded-lg font-terminal text-lg transition flex items-center gap-2 shadow-lg">
+                                ▶ Watch / Listen on YouTube ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Playlist Selector (Direct YouTube Links) -->
+                <div class="bg-slate-800 border-2 border-slate-700 rounded-xl p-4">
+                    <h4 class="font-terminal text-xl text-slate-200 mb-3">SELECTABLE PLAYLIST</h4>
+                    <div class="space-y-2 font-code text-xs">
+                        
+                        <!-- Track 1: Spellbound -->
+                        <button onclick="selectYouTubeTrack(0, 'Spellbound - Yuvan Shankar Raja', 'Yuvan Shankar Raja • Cinematic Soundscape', 'https://www.youtube.com/results?search_query=Spellbound+Yuvan+Shankar+Raja', 'This track represents the ultimate cinematic soundscape—pure atmospheric magic that fits your creative wavelengths perfectly.')" class="w-full text-left p-3 rounded bg-slate-700 hover:bg-purple-900 border border-slate-600 transition flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-slate-100">1. Spellbound</div>
+                                <div class="text-slate-400 text-[10px]">Yuvan Shankar Raja</div>
+                            </div>
+                            <span class="text-red-400">▶</span>
+                        </button>
+
+                        <!-- Track 2: Amrinder Gill Special -->
+                        <button onclick="selectYouTubeTrack(1, 'Melodic Classics - Amrinder Gill', 'Amrinder Gill Special • Soulful Vibes', 'Timeless melodies that hit different during late-night art sessions and deep daydreams.')" class="w-full text-left p-3 rounded bg-slate-700 hover:bg-purple-900 border border-slate-600 transition flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-slate-100"><a href="https://www.youtube.com/results?search_query=Amrinder+Gill+hit+songs" target="_blank">2. Melodic Classics</a></div>
+                                <div class="text-slate-400 text-[10px]">Amrinder Gill Special</div>
+                            </div>
+                            <span class="text-red-400">▶</span>
+                        </button>
+
+                        <!-- Track 3: Late Night Creative Loop -->
+                        <button onclick="selectYouTubeTrack(2, 'Late Night Creative Loop', 'Custom Vibe Selection', 'The official soundtrack of unhinged productivity and chaotic artistic genius.')" class="w-full text-left p-3 rounded bg-slate-700 hover:bg-purple-900 border border-slate-600 transition flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-slate-100"><a href="https://www.youtube.com/results?search_query=late+night+lofi+chill+beats" target="_blank">3. Late Night Creative Loop</a></div>
+                                <div class="text-slate-400 text-[10px]">Custom Vibe Selection</div>
+                            </div>
+                            <span class="text-red-400">▶</span>
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECTION 5: THE NICHE MEME & REEL ARCHIVE
+             ========================================== -->
+        <section id="memeArchive" class="bg-amber-100/90 wobbly-border p-6 md:p-10 shadow-lg relative">
+            <div class="text-center mb-8">
+                <span class="px-3 py-1 bg-amber-300 border border-amber-500 rounded-full text-xs font-code font-bold">WARNING: CHRONICALLY ONLINE HUMOR</span>
+                <h2 class="text-4xl md:text-6xl font-bold font-handwriting text-slate-900 mt-2">🐸 The Niche Meme & Brainrot Lab</h2>
+                <p class="text-slate-700 text-base max-w-xl mx-auto">Scientific evidence that your brain operates on a completely higher frequency of absurd humor & iconic Reel references.</p>
+            </div>
+
+            <!-- Fictional Brain Scan Report -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white p-6 wobbly-border-sm shadow">
+                    <h3 class="font-bold font-code text-xl text-purple-900 mb-3">🧠 Diagnostic Brain Composition</h3>
+                    <ul class="space-y-3 font-code text-sm text-slate-800">
+                        <li class="flex justify-between items-center border-b pb-1">
+                            <span>Instagram Reel Audio Loops:</span>
+                            <span class="font-bold text-purple-700">78%</span>
+                        </li>
+                        <li class="flex justify-between items-center border-b pb-1">
+                            <span>Absurd & Unhinged Memes:</span>
+                            <span class="font-bold text-pink-600">18%</span>
+                        </li>
+                        </li>
+                        <li class="flex justify-between items-center">
+                            <span>Pure Unadulterated Genius:</span>
+                            <span class="font-bold text-green-600">4%</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Interactive Meme Quote Deck Generator -->
+                <div class="bg-white p-6 wobbly-border-sm shadow flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold font-code text-xl text-purple-900 mb-2">🎲 Random Reel/Meme Quote Deck</h3>
+                        <p class="text-xs text-slate-500 mb-4">Click the button below to draw an absurd, highly specific inside joke card!</p>
+                        <div id="memeQuoteDisplay" class="bg-yellow-50 border-2 border-dashed border-yellow-400 p-4 rounded-xl text-center font-handwriting text-2xl text-slate-800 min-h-[90px] flex items-center justify-center">
+                            "Click below to generate an iconic inside joke..."
+                        </div>
+                    </div>
+                    <button onclick="generateRandomMeme()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-lg font-code transition transform active:scale-95">
+                        🔄 Draw Random Meme Card
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECTION 6: THE SECRET FOLDER (EASTER EGG)
+             ========================================== -->
+        <section id="secretVault" class="bg-indigo-950 text-indigo-100 wobbly-border p-6 md:p-10 shadow-2xl relative">
+            <div class="text-center max-w-xl mx-auto">
+                <div class="text-5xl mb-2 animate-bounce">💾</div>
+                <h2 class="text-3xl md:text-4xl font-bold font-terminal text-indigo-300">TOP SECRET :: CLASSIFIED_BIRTHDAY_DATA.DAT</h2>
+                <p class="text-xs font-code text-indigo-400 mt-1 mb-6">Restricted access! Enter password to decrypt secret compliments and badges.</p>
+
+                <!-- Password Input Terminal -->
+                <div id="lockScreen" class="bg-indigo-900/80 border border-indigo-700 p-6 rounded-xl shadow-inner">
+                    <p class="font-code text-xs text-yellow-300 mb-3">💡 Hint: The password is default <b>magic2026</b> (or click bypass)</p>
+                    <div class="flex flex-col sm:flex-row gap-2 justify-center">
+                        <label for="vaultPasswordInput" class="sr-only">Secret Password</label>
+                        <input type="password" id="vaultPasswordInput" placeholder="Enter password..." class="px-4 py-2 rounded bg-indigo-950 border border-indigo-600 text-white font-code text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        <button onclick="checkVaultPassword()" class="bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-bold font-code px-6 py-2 rounded transition">
+                            🔓 UNLOCK
+                        </button>
+                    </div>
+                    <p id="vaultError" class="text-xs text-red-400 font-code mt-2 min-h-[18px]"></p>
+                </div>
+
+                <!-- Unlocked Secret Vault (Initially Hidden) -->
+                <div id="unlockedVault" class="hidden bg-indigo-900 border-2 border-indigo-400 p-6 rounded-xl mt-4 text-left space-y-4">
+                    <div class="flex items-center justify-between border-b border-indigo-700 pb-2">
+                        <span class="font-bold text-yellow-400 font-code">🏆 UNLOCKED: CERTIFICATE OF UNHINGED GENIUS</span>
+                        <span class="text-xs bg-yellow-400 text-slate-950 font-bold px-2 py-1 rounded">OFFICIAL</span>
+                    </div>
+                    <p class="text-base text-indigo-200">
+                        Congratulations! You have bypassed security. This officially certifies that <span class="friend-name-display font-bold text-white">Sahaj</span> is 100% immune to being ordinary and is guaranteed to make any room 10x funnier and more creative.
+                    </p>
+                    <div class="p-3 bg-indigo-950 rounded border border-indigo-800 text-xs font-code text-indigo-300">
+                        🔒 <em>User Security Note: Made by Jagriti and AI</em>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             SECTION 7: THE HEARTFELT BIRTHDAY LETTER
+             ========================================== -->
+        <section id="letterSection" class="bg-amber-50 wobbly-border p-6 md:p-12 shadow-xl relative">
+            <!-- Paper Tape Decorators -->
+            <div class="tape absolute -top-4 left-8 w-32 h-8 border border-slate-300"></div>
+            <div class="tape absolute -bottom-4 right-8 w-32 h-8 border border-slate-300"></div>
+
+            <div class="max-w-2xl mx-auto space-y-6">
+                <div class="text-center">
+                    <span class="text-sm font-code text-rose-600 uppercase tracking-widest font-bold">💌 A Real Human Note</span>
+                    <h2 class="text-4xl md:text-6xl font-bold font-handwriting text-slate-900">Dear <span class="friend-name-display">Sahaj</span>,</h2>
+                </div>
+
+                <div class="text-xl md:text-2xl text-slate-800 leading-relaxed font-sans space-y-4 border-l-4 border-rose-300 pl-4 md:pl-6">
+                    <p>
+                        Beyond all the retro computer archives, jokes, meme generators, and code loops—This is to wish you a happy Birthday.
+                    </p>
+                    <p>
+                        Your creative energy, your incredible art, your chaotic humor, and your passion for music make the world so much brighter.
+                    </p>
+                    <p>
+                        The clay bow was attacked by fungi-
+                    </p>
+                </div>
+
+                <div class="text-right pt-4 font-handwriting text-3xl font-bold text-slate-900">
+                    With endless appreciation,<br>
+                    <span class="text-purple-800">Your To-Be-Developer-Friend</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 text-xs font-code text-slate-500 border-t border-slate-200 mt-12">
+        Hand-coded with vanilla HTML, CSS & JavaScript for <span class="friend-name-display font-bold">Sahaj</span> • 2026 Edition
+    </footer>
+
+    <!-- ==========================================
+         BEGINNER-FRIENDLY JAVASCRIPT LOGIC
+         ========================================== -->
+    <script>
+        /*
+          ================================================================
+          EDUCATIONAL JAVASCRIPT GUIDE FOR C PROGRAMMERS:
+          1. In C, you use variables like `int x = 10;`. In JavaScript, we use
+             `let` (mutable) and `const` (constant).
+          2. The `document.getElementById('id')` is how JS accesses DOM (HTML)
+             elements, similar to accessing structures/pointers.
+          3. Functions in JS look like `function myFunc(param) { ... }`.
+          4. Arrays in JS are flexible: `const list = ["a", "b", "c"];`.
+          ================================================================
+        */
+
+        // GLOBAL VARIABLES (State management)
+        let friendName = "Sahaj"; // Default friend name
+        let currentTrackIndex = 0; // Tracks active audio index
+
+        // Array of Meme Quote Cards (Inside jokes & unhinged references)
+        const memeQuotes = [
+            "\"Me listening to Spellbound on loop while drawing at 3 AM: Peak existence.\"",
+            "\"Brain activity report: 90% absurd Reels, 10% pure artistic genius.\"",
+            "\"When the Amrinder Gill track hits just right on a late night drive...\"",
+            "\"POV: You created a character art masterpiece instead of sleeping.\"",
+            "\"Warning: Unusually high concentration of niche humor detected in this exact coordinate.\""
+        ];
+
+        // Playlist Data Structure (Array of Objects)
+        const playlist = [
+            {
+                title: "Spellbound - Yuvan Shankar Raja",
+                artist: "Yuvan Shankar Raja",
+                note: "\"This track represents the ultimate cinematic soundscape—pure atmospheric magic that fits your creative wavelengths perfectly.\"",
+                url: "https://www.youtube.com/results?search_query=Spellbound+Yuvan+Shankar+Raja"
+            },
+            {
+                title: "Melodic Classics - Amrinder Gill",
+                artist: "Amrinder Gill",
+                note: "\"Pure soul, nostalgia, and incredible energy. A timeless soundtrack for good vibes and great memories.\"",
+                url: "https://www.youtube.com/results?search_query=Amrinder+Gill+Hits"
+            },
+            {
+                title: "Late Night Creative Loop",
+                artist: "Artistic Flow State",
+                note: "\"The exact music energy required when sketching characters while the rest of the world is asleep.\"",
+                url: "https://www.youtube.com/results?search_query=Chill+Lofi+Creative+Art+Music"
+            }
+        ];
+
+        // WINDOW ONLOAD EVENT (Executes once HTML finishes loading)
+        window.onload = function() {
+            startTerminalBootSequence();
+            setupCanvas();
+        };
+
+        // -----------------------------------------------------------------
+        // 1. TERMINAL TYPEWRITER & BOOT SEQUENCE LOGIC
+        // -----------------------------------------------------------------
+        function startTerminalBootSequence() {
+            const terminalLog = document.getElementById("terminalLog");
+            const progressBar = document.getElementById("progressBar");
+            const progressPercent = document.getElementById("progressPercent");
+            const progressStatus = document.getElementById("progressStatus");
+            const accessBtn = document.getElementById("accessBtn");
+
+            const bootMessages = [
+                "> Initializing birthday archive v2026...",
+                "> Scanning coordinates for magical creativity...",
+                "> Anomaly detected: High density of character art & music taste.",
+                "> Subject identified: " + friendName + "(2007 Edition)...",
+                "> Status: 100% Unhinged Ball-Recogniser. Access Granted!"
+            ];
+
+            let messageIndex = 0;
+            let progress = 0;
+
+            // Simulated progress bar ticker
+            const progressInterval = setInterval(() => {
+                progress += 2;
+                if (progress <= 100) {
+                    progressBar.style.width = progress + "%";
+                    progressPercent.innerText = progress + "%";
+                } else {
+                    clearInterval(progressInterval);
+                    progressStatus.innerText = "System scan complete!";
+                    // Reveal Access Button
+                    accessBtn.classList.remove("hidden");
+                    setTimeout(() => {
+                        accessBtn.classList.remove("opacity-0", "translate-y-4");
+                    }, 100);
+                }
+            }, 50);
+
+            // Print messages line by line
+            function printNextMessage() {
+                if (messageIndex < bootMessages.length) {
+                    const p = document.createElement("p");
+                    p.innerText = bootMessages[messageIndex];
+                    terminalLog.appendChild(p);
+                    messageIndex++;
+                    setTimeout(printNextMessage, 600);
+                }
+            }
+            printNextMessage();
+        }
+
+        // UNLOCK MAIN ARCHIVE (Transitions from Terminal to Website)
+        function unlockMainArchive() {
+            const terminalScreen = document.getElementById("terminalScreen");
+            const mainContent = document.getElementById("mainContent");
+
+            terminalScreen.classList.add("opacity-0");
+            setTimeout(() => {
+                terminalScreen.classList.add("hidden");
+                mainContent.classList.remove("hidden");
+                setTimeout(() => {
+                    mainContent.classList.remove("opacity-0");
+                }, 50);
+            }, 700);
+        }
+
+        // -----------------------------------------------------------------
+        // 2. NAME CUSTOMIZATION LOGIC
+        // -----------------------------------------------------------------
+        function updateFriendName() {
+            const inputVal = document.getElementById("friendNameInput").value;
+            if (inputVal.trim() !== "") {
+                friendName = inputVal.trim();
+                // Query all DOM elements with class 'friend-name-display' and update them
+                const displays = document.querySelectorAll(".friend-name-display");
+                displays.forEach(el => el.innerText = friendName);
+                
+                const feedback = document.getElementById("interactiveFeedback");
+                feedback.innerText = "✨ Name updated across archive to: " + friendName;
+            }
+        }
+
+        // -----------------------------------------------------------------
+        // 3. ART GALLERY MODAL FUNCTIONS
+        // -----------------------------------------------------------------
+        function openArtModal(title, subtitle, desc, imgSrc) {
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalSubtitle").innerText = subtitle;
+            document.getElementById("modalDescription").innerText = desc;
+            document.getElementById("modalImg").src = imgSrc;
+            
+            const modal = document.getElementById("artModal");
+            modal.classList.remove("hidden");
+        }
+
+        function closeArtModal() {
+            document.getElementById("artModal").classList.add("hidden");
+        }
+
+        // -----------------------------------------------------------------
+        // 4. MUSIC PLAYER FUNCTIONS
+        // -----------------------------------------------------------------
+        function selectTrack(index) {
+            currentTrackIndex = index;
+            const track = playlist[index];
+            document.getElementById("currentTrackTitle").innerText = track.title;
+            document.getElementById("currentArtist").innerText = "Artist: " + track.artist;
+            document.getElementById("trackPersonalNote").innerText = track.note;
+            document.getElementById("externalMusicLink").href = track.url;
+            document.getElementById("playerStatus").innerText = "● TRACK CHANGED";
+        }
+
+        function playAudioSimulation() {
+            const btn = document.getElementById("playPauseBtn");
+            const status = document.getElementById("playerStatus");
+            if (btn.innerText.includes("PLAY")) {
+                btn.innerText = "⏸ PAUSE PREVIEW";
+                status.innerText = "▶ PLAYING AUDIO SIMULATION";
+                status.classList.add("animate-pulse");
+            } else {
+                btn.innerText = "▶ PLAY PREVIEW";
+                status.innerText = "⏸ PAUSED";
+                status.classList.remove("animate-pulse");
+            }
+        }
+
+        // -----------------------------------------------------------------
+        // 5. MEME GENERATOR
+        // -----------------------------------------------------------------
+        function generateRandomMeme() {
+            // Equivalent to rand() % length in C
+            const randomIndex = Math.floor(Math.random() * memeQuotes.length);
+            document.getElementById("memeQuoteDisplay").innerText = memeQuotes[randomIndex];
+        }
+
+        // -----------------------------------------------------------------
+        // 6. SECRET VAULT PASSWORD CHECK
+        // -----------------------------------------------------------------
+        function checkVaultPassword() {
+            const passwordInput = document.getElementById("vaultPasswordInput").value;
+            const errorMsg = document.getElementById("vaultError");
+            
+            if (passwordInput === "magic2026" || passwordInput === "") {
+                document.getElementById("lockScreen").classList.add("hidden");
+                document.getElementById("unlockedVault").classList.remove("hidden");
+                errorMsg.innerText = "";
+            } else {
+                errorMsg.innerText = "❌ Incorrect password! Hint: magic2026";
+            }
+        }
+
+        // -----------------------------------------------------------------
+        // 7. MINI SURPRISE INTERACTION
+        // -----------------------------------------------------------------
+        function triggerMiniSurprise() {
+            const feedback = document.getElementById("interactiveFeedback");
+            const surprises = [
+                "🎉 Anomaly status: 100% chance of cake & iconic music!",
+                "🎨 Unofficial Louvre Announcement: Character art exhibited today!",
+                "✨ System diagnosis: Unreasonable levels of creativity detected."
+            ];
+            const randomIndex = Math.floor(Math.random() * surprises.length);
+            feedback.innerText = surprises[randomIndex];
+        }
+
+        // -----------------------------------------------------------------
+        // 8. CANVAS CELEBRATION STAR & CONFETTI ANIMATION
+        // -----------------------------------------------------------------
+        let canvas, ctx;
+        let particles = [];
+
+        function setupCanvas() {
+            canvas = document.getElementById("celebrationCanvas");
+            ctx = canvas.getContext("2d");
+            // Set internal resolution matching element size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            // Draw default starry night background on load
+            drawStarryNight();
+        }
+
+        function drawStarryNight() {
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background stars
+            ctx.fillStyle = "#fef08a";
+            for (let i = 0; i < 50; i++) {
+                const x = (Math.sin(i * 99) * 0.5 + 0.5) * canvas.width;
+                const y = (Math.cos(i * 33) * 0.5 + 0.5) * canvas.height;
+                const radius = (i % 3) + 1;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "20px 'Patrick Hand', cursive";
+            ctx.textAlign = "center";
+            ctx.fillText("✨ Click 'LAUNCH BIRTHDAY ANOMALY' for confetti fireworks! ✨", canvas.width / 2, canvas.height / 2);
+        }
+
+        function launchFinalCelebration() {
+            particles = [];
+            const colors = ["#f43f5e", "#a855f7", "#eab308", "#22c55e", "#3b82f6", "#ec4899"];
+
+            // Spawn 100 confetti particles
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.7) * 12,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    gravity: 0.15
+                });
+            }
+
+            animateCanvas();
+        }
+
+        function animateCanvas() {
+            ctx.fillStyle = "rgba(15, 23, 42, 0.2)"; // Fade effect
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let activeParticles = 0;
+
+            particles.forEach(p => {
+                if (p.y < canvas.height) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    activeParticles++;
+                }
+            });
+
+            if (activeParticles > 0) {
+                requestAnimationFrame(animateCanvas);
+            } else {
+                drawStarryNight(); // Reset canvas state after animation ends
+            }
+        }
+    </script>
+</body>
+</html>
